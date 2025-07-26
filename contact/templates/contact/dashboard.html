@@ -1,0 +1,259 @@
+{% extends 'core/base.html' %}
+
+{% block title %}
+    Dashboard
+{% endblock title %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Main Content -->
+        <main class="col-12">
+            <div class="container my-4">
+                <div class="content-card mx-auto" style="max-width: 1200px;">
+                    
+                    <div class="content-header text-center mb-5">
+                        <h1 class="display-4 fw-bold text-primary mb-3">Dashboard</h1>
+                        <p class="lead text-muted">Welcome to your contact management dashboard</p>
+                    </div>
+                    
+                 {% if request.user.is_authenticated %}  
+                        <div class="page-content">
+                            <!-- Welcome Section -->
+                            <div class="row mb-5">
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h3 class="card-title text-dark mb-3">
+                                                👋 Welcome back, {{ request.user.username|default:"User" }}!
+                                            </h3>
+                                            <p class="card-text text-muted">
+                                                This is your main dashboard where you can see an overview of your contacts and recent activities.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Statistics Cards -->
+                            <div class="row g-4 mb-5">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                                        <div class="card-body text-center text-white p-4">
+                                            <div class="mb-3">
+                                                <i class="fas fa-users fa-3x opacity-75"></i>
+                                            </div>
+                                            <h4 class="card-title fw-bold">Total Contacts</h4>
+                                            <p class="card-text display-6 fw-bold mb-0">{{ total_contacts|default:"250" }}</p>
+                                            <small class="opacity-75">Contacts in your database</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+                                        <div class="card-body text-center text-white p-4">
+                                            <div class="mb-3">
+                                                <i class="fas fa-user-plus fa-3x opacity-75"></i>
+                                            </div>
+                                            <h4 class="card-title fw-bold">Recent Additions</h4>
+                                            <p class="card-text display-6 fw-bold mb-0">{{ recent_additions|default:"15" }}</p>
+                                            <small class="opacity-75">Added this month</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="card border-0 shadow-sm h-100" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+                                        <div class="card-body text-center text-white p-4">
+                                            <div class="mb-3">
+                                                <i class="fas fa-tags fa-3x opacity-75"></i>
+                                            </div>
+                                            <h4 class="card-title fw-bold">Categories</h4>
+                                            <p class="card-text display-6 fw-bold mb-0">{{ categories_count|default:"8" }}</p>
+                                            <small class="opacity-75">Contact categories</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="row mb-5">
+                                <div class="col-12">
+                                    <div class="card border-0 shadow-sm">
+                                        <div class="card-header bg-transparent border-0 py-3">
+                                            <h5 class="card-title mb-0 fw-bold">
+                                                <i class="fas fa-bolt text-warning me-2"></i>
+                                                Quick Actions
+                                            </h5>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="row g-3">
+                                                <div class="col-lg-3 col-md-6">
+                                                    <a href=" " class="btn btn-primary btn-lg w-100 py-3">
+                                                        <i class="fas fa-plus-circle me-2"></i>
+                                                        Add Contact
+                                                    </a>
+                                                </div>
+                                                <div class="col-lg-3 col-md-6">
+                                                    <a href="" class="btn btn-success btn-lg w-100 py-3">
+                                                        <i class="fas fa-list me-2"></i>
+                                                        View Contacts
+                                                    </a>
+                                                </div>
+                                                <div class="col-lg-3 col-md-6">
+                                                    <button class="btn btn-info btn-lg w-100 py-3" onclick="exportContacts()">
+                                                        <i class="fas fa-download me-2"></i>
+                                                        Export Contacts
+                                                    </button>
+                                                </div>
+                                                <div class="col-lg-3 col-md-6">
+                                                    <a href="" class="btn btn-secondary btn-lg w-100 py-3">
+                                                        <i class="fas fa-cog me-2"></i>
+                                                        Settings
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Activity -->
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-header bg-transparent border-0 py-3">
+                                            <h5 class="card-title mb-0 fw-bold">
+                                                <i class="fas fa-clock text-primary me-2"></i>
+                                                Recent Activity
+                                            </h5>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            {% if recent_activities %}
+                                                <div class="list-group list-group-flush">
+                                                    {% for activity in recent_activities %}
+                                                        <div class="list-group-item border-0 px-0 py-3">
+                                                            <div class="d-flex align-items-center">
+                                                                <div class="flex-shrink-0 me-3">
+                                                                    <div class="rounded-circle bg-light p-2">
+                                                                        <i class="fas fa-user-edit text-muted"></i>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex-grow-1">
+                                                                    <h6 class="mb-1">{{ activity.description }}</h6>
+                                                                    <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                </div>
+                                            {% else %}
+                                                <div class="text-center py-4">
+                                                    <i class="fas fa-history fa-3x text-muted mb-3"></i>
+                                                    <p class="text-muted">No recent activity to display.</p>
+                                                    <p class="text-muted">Start by adding some contacts!</p>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="card border-0 shadow-sm h-100">
+                                        <div class="card-header bg-transparent border-0 py-3">
+                                            <h5 class="card-title mb-0 fw-bold">
+                                                <i class="fas fa-star text-warning me-2"></i>
+                                                Quick Stats
+                                            </h5>
+                                        </div>
+                                        <div class="card-body p-4">
+                                            <div class="mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted">Contacts Added Today</span>
+                                                    <span class="fw-bold">{{ contacts_today|default:"5" }}</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-4">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted">This Week</span>
+                                                    <span class="fw-bold">{{ contacts_week|default:"23" }}</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-info" style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-0">
+                                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                                    <span class="text-muted">This Month</span>
+                                                    <span class="fw-bold">{{ contacts_month|default:"156" }}</span>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-warning" style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+             {% else %}
+                        <!-- Not Authenticated -->
+                        <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                            <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%;">
+                                <div class="card-body p-5 text-center">
+                                    <div class="mb-4">
+                                        <i class="fas fa-lock fa-4x text-muted"></i>
+                                    </div>
+                                    <h3 class="card-title mb-3 text-dark fw-bold">Authentication Required</h3>
+                                    <p class="card-text text-muted mb-4">
+                                        Please log in to access your contact management dashboard and view your contacts.
+                                    </p>
+                                    <div class="d-grid gap-2">
+                                        <a href="" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-sign-in-alt me-2"></i>
+                                            Login to Continue
+                                        </a>
+                                        <a href="" class="btn btn-outline-secondary">
+                                            Don't have an account? Sign up
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>   
+                   {% endif %}   
+                    
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function exportContacts() {
+        // Add your export functionality here
+        alert('Export functionality would be implemented here');
+    }
+    
+    // Add fade-in animation for dashboard cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.5s ease';
+            
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
+{% endblock body %}

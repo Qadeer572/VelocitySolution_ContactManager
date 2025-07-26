@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea, #764ba2); /* match dashboard */
+    }
+
+    .form-container {
+      width: 100%;
+      max-width: 450px;
+      padding: 40px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+      color: #444;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #28a745;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 15px;
+      color: #333;
+    }
+
+    .login-link a {
+      color: #28a745;
+      text-decoration: none;
+    }
+
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+
+    .error-msg {
+      color: red;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Register</h2>
+    <form method="post" action="/register/">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="error-msg">
+          <ul>
+            {% for field in form %}
+              {% for error in field.errors %}
+                <li>{{ field.label }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <label for="id_username">Username:</label>
+      {{ form.username }}
+
+      <label for="id_email">Email:</label>
+      {{ form.email }}
+
+      <label for="id_password1">Password:</label>
+      {{ form.password1 }}
+
+      <label for="id_password2">Confirm Password:</label>
+      {{ form.password2 }}
+
+      <button type="submit">Register</button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a href="{% url 'login' %}">Login</a>
+    </div>
+  </div>
+</body>
+</html>
