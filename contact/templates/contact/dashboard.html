@@ -44,7 +44,7 @@
                                                 <i class="fas fa-users fa-3x opacity-75"></i>
                                             </div>
                                             <h4 class="card-title fw-bold">Total Contacts</h4>
-                                            <p class="card-text display-6 fw-bold mb-0">{{ total_contacts|default:"250" }}</p>
+                                            <p class="card-text display-6 fw-bold mb-0">{{ context.Totalcontacts}}</p>
                                             <small class="opacity-75">Contacts in your database</small>
                                         </div>
                                     </div>
@@ -57,7 +57,7 @@
                                                 <i class="fas fa-user-plus fa-3x opacity-75"></i>
                                             </div>
                                             <h4 class="card-title fw-bold">Recent Additions</h4>
-                                            <p class="card-text display-6 fw-bold mb-0">{{ recent_additions|default:"15" }}</p>
+                                            <p class="card-text display-6 fw-bold mb-0">{{ context.recentAddition}}</p>
                                             <small class="opacity-75">Added this month</small>
                                         </div>
                                     </div>
@@ -70,7 +70,7 @@
                                                 <i class="fas fa-tags fa-3x opacity-75"></i>
                                             </div>
                                             <h4 class="card-title fw-bold">Categories</h4>
-                                            <p class="card-text display-6 fw-bold mb-0">{{ categories_count|default:"8" }}</p>
+                                            <p class="card-text display-6 fw-bold mb-0">{{ context.TotalCategories}}</p>
                                             <small class="opacity-75">Contact categories</small>
                                         </div>
                                     </div>
@@ -90,13 +90,13 @@
                                         <div class="card-body p-4">
                                             <div class="row g-3">
                                                 <div class="col-lg-3 col-md-6">
-                                                    <a href=" " class="btn btn-primary btn-lg w-100 py-3">
+                                                    <a href="/add_contact/" class="btn btn-primary btn-lg w-100 py-3">
                                                         <i class="fas fa-plus-circle me-2"></i>
                                                         Add Contact
                                                     </a>
                                                 </div>
                                                 <div class="col-lg-3 col-md-6">
-                                                    <a href="" class="btn btn-success btn-lg w-100 py-3">
+                                                    <a href="/contact/" class="btn btn-success btn-lg w-100 py-3">
                                                         <i class="fas fa-list me-2"></i>
                                                         View Contacts
                                                     </a>
@@ -171,7 +171,7 @@
                                             <div class="mb-4">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <span class="text-muted">Contacts Added Today</span>
-                                                    <span class="fw-bold">{{ contacts_today|default:"5" }}</span>
+                                                    <span class="fw-bold">{{ context.dayContact}}</span>
                                                 </div>
                                                 <div class="progress" style="height: 6px;">
                                                     <div class="progress-bar bg-success" style="width: 100%"></div>
@@ -181,7 +181,7 @@
                                             <div class="mb-4">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <span class="text-muted">This Week</span>
-                                                    <span class="fw-bold">{{ contacts_week|default:"23" }}</span>
+                                                    <span class="fw-bold">{{ context.weekContact }}</span>
                                                 </div>
                                                 <div class="progress" style="height: 6px;">
                                                     <div class="progress-bar bg-info" style="width: 100%"></div>
@@ -191,7 +191,7 @@
                                             <div class="mb-0">
                                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                                     <span class="text-muted">This Month</span>
-                                                    <span class="fw-bold">{{ contacts_month|default:"156" }}</span>
+                                                    <span class="fw-bold">{{context.monthContact}}</span>
                                                 </div>
                                                 <div class="progress" style="height: 6px;">
                                                     <div class="progress-bar bg-warning" style="width: 100%"></div>
@@ -216,11 +216,11 @@
                                         Please log in to access your contact management dashboard and view your contacts.
                                     </p>
                                     <div class="d-grid gap-2">
-                                        <a href="" class="btn btn-primary btn-lg">
+                                        <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
                                             <i class="fas fa-sign-in-alt me-2"></i>
                                             Login to Continue
                                         </a>
-                                        <a href="" class="btn btn-outline-secondary">
+                                        <a href="{% url 'register' %}" class="btn btn-outline-secondary">
                                             Don't have an account? Sign up
                                         </a>
                                     </div>

@@ -1,22 +1,22 @@
 {% extends 'core/base.html' %}
 
-{% block title %}Add New Contact{% endblock title %}
+{% block title %}Update Contact{% endblock title %}
 
 {% block body %}
 <div class="container-fluid py-5 bg-light">
-    
+    {% if request.user.is_authenticated %}
         <!-- Authenticated User Section -->
         <div class="row justify-content-center">
             <div class="col-lg-6 col-md-8 col-sm-10">
                 <div class="card shadow-lg border-0 rounded-4">
                     <div class="card-header bg-gradient-primary text-white text-center py-4 rounded-top-4">
                         <h2 class="mb-0 fw-bold">
-                            <i class="fas fa-user-plus me-2"></i>
-                            Add New Contact
+                            <i class="fas fa-user-edit me-2"></i>
+                            Update Contact
                         </h2>
-                        <p class="mb-0 mt-2 opacity-75">Enter the details to add a new contact to your address book</p>
+                        <p class="mb-0 mt-2 opacity-75">Modify the contact details below</p>
                     </div>
-                    {% if request.user.is_authenticated %}
+                    
                     <div class="card-body p-5">
                         <form method="post" action="" novalidate>
                             {% csrf_token %}
@@ -33,93 +33,35 @@
                                 </div>
                             {% endif %}
 
-                            <!-- Name Field -->
-                            <div class="mb-4">
-                                <label for="id_name" class="form-label fw-semibold">
-                                    <i class="fas fa-user me-2 text-primary"></i>Full Name
-                                </label>
-                                <div class="input-group">
-                                    {{ form.name }}
-                                </div>
-                                {% if form.name.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        <i class="fas fa-exclamation-circle me-1"></i>
-                                        {{ form.name.errors.0 }}
+                            <!-- Form Fields -->
+                            {% for field in form %}
+                                <div class="mb-4">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas {{ field.label|lower|slugify|add:'-icon' }} me-2 text-primary"></i>
+                                        {{ field.label }}
+                                    </label>
+                                    <div class="input-group">
+                                        {{ field }}
                                     </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Email Field -->
-                            <div class="mb-4">
-                                <label for="id_email" class="form-label fw-semibold">
-                                    <i class="fas fa-envelope me-2 text-primary"></i>Email Address
-                                </label>
-                                <div class="input-group">
-                                    {{ form.email }}
+                                    {% if field.help_text %}
+                                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            {{ field.errors.0 }}
+                                        </div>
+                                    {% endif %}
                                 </div>
-                                {% if form.email.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        <i class="fas fa-exclamation-circle me-1"></i>
-                                        {{ form.email.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
+                            {% endfor %}
 
-                            <!-- Phone Field -->
-                            <div class="mb-4">
-                                <label for="id_phone" class="form-label fw-semibold">
-                                    <i class="fas fa-phone me-2 text-primary"></i>Phone Number
-                                </label>
-                                <div class="input-group">
-                                    {{ form.phone }}
-                                </div>
-                                {% if form.phone.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        <i class="fas fa-exclamation-circle me-1"></i>
-                                        {{ form.phone.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Category Field -->
-                            <div class="mb-4">
-                                <label for="id_category" class="form-label fw-semibold">
-                                    <i class="fas fa-tags me-2 text-primary"></i>Category
-                                </label>
-                                <div class="input-group">
-                                    {{ form.Catagory }}
-                                </div>
-                                {% if form.category.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        <i class="fas fa-exclamation-circle me-1"></i>
-                                        {{ form.category.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Address Field -->
-                            <div class="mb-5">
-                                <label for="id_address" class="form-label fw-semibold">
-                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Address
-                                </label>
-                                <div class="input-group">
-                                    {{ form.address }}
-                                </div>
-                                {% if form.address.errors %}
-                                    <div class="invalid-feedback d-block">
-                                        <i class="fas fa-exclamation-circle me-1"></i>
-                                        {{ form.address.errors.0 }}
-                                    </div>
-                                {% endif %}
-                            </div>
-
-                            <!-- Submit Button -->
+                            <!-- Submit and Back Buttons -->
                             <div class="d-grid gap-3">
                                 <button type="submit" class="btn btn-primary btn-lg py-3 fw-semibold">
-                                    <i class="fas fa-plus-circle me-2"></i>
-                                    Add Contact
+                                    <i class="fas fa-save me-2"></i>
+                                    Update Contact
                                 </button>
-                                <a href="/contact/" class="btn btn-outline-secondary btn-lg py-3">
+                                <a href="{% url 'contact' %}" class="btn btn-outline-secondary btn-lg py-3">
                                     <i class="fas fa-arrow-left me-2"></i>
                                     Back to Contacts
                                 </a>
@@ -131,29 +73,43 @@
         </div>
 
     {% else %}
-       <!-- Not Authenticated -->
-       <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
-        <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%;">
-            <div class="card-body p-5 text-center">
-                <div class="mb-4">
-                    <i class="fas fa-lock fa-4x text-muted"></i>
-                </div>
-                <h3 class="card-title mb-3 text-dark fw-bold">Authentication Required</h3>
-                <p class="card-text text-muted mb-4">
-                    Please log in to access your contact management dashboard and view your contacts.
-                </p>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
-                        <i class="fas fa-sign-in-alt me-2"></i>
-                        Login to Continue
-                    </a>
-                    <a href="{% url 'register' %}" class="btn btn-outline-secondary">
-                        Don't have an account? Sign up
-                    </a>
+        <!-- Not Authenticated Section -->
+        <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+            <div class="col-lg-5 col-md-7 col-sm-9">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5 text-center">
+                        <!-- Lock Icon with Animation -->
+                        <div class="mb-4">
+                            <div class="auth-icon-wrapper">
+                                <i class="fas fa-lock fa-4x text-primary mb-3"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Header -->
+                        <h2 class="card-title mb-3 text-dark fw-bold">Access Restricted</h2>
+                        <p class="card-text text-muted mb-4 lead">
+                            Please sign in to update contact information.
+                        </p>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-lg py-3 fw-semibold">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Sign In
+                            </a>
+                            <div class="text-center">
+                                <span class="text-muted">New here?</span>
+                                <a href="{% url 'register' %}" class="btn btn-outline-success btn-lg ms-2">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Create Account
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>   
     {% endif %}
 </div>
 
@@ -225,6 +181,11 @@
         margin-top: 0.5rem;
         display: flex;
         align-items: center;
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: #6b7280;
     }
 
     /* Buttons */
@@ -301,6 +262,13 @@
             opacity: 0.6;
         }
     }
+
+    /* Icon Mapping for Fields */
+    .name-icon::before { content: '\f007'; } /* fa-user */
+    .email-icon::before { content: '\f0e0'; } /* fa-envelope */
+    .phone-icon::before { content: '\f095'; } /* fa-phone */
+    .category-icon::before { content: '\f02c'; } /* fa-tags */
+    .address-icon::before { content: '\f3c5'; } /* fa-map-marker-alt */
 
     /* Responsive Design */
     @media (max-width: 768px) {

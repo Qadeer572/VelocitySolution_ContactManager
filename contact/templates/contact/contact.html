@@ -1,9 +1,303 @@
 {% extends 'core/base.html' %}
 
-{% block title %}   
-Contact Management Dashboard
-{% endblock title %}
+{% block title %}All Contacts{% endblock title %}
 
 {% block body %}
-    <h1>Welcome to Contact Page</h1>
+<div class="container-fluid py-5 bg-light">
+    {% if request.user.is_authenticated %}
+        <!-- Authenticated User Section -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-md-12">
+                <!-- Search Bar -->
+                <div class="card shadow-lg border-0 rounded-4 mb-4">
+                    <div class="card-body p-4">
+                        <form method="get" action="" class="d-flex align-items-center">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="fas fa-search text-primary"></i>
+                                </span>
+                                <input type="text" name="q" class="form-control border-start-0" placeholder="Search by name or email..." value="{{ request.GET.q }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary ms-3">
+                                <i class="fas fa-search me-2"></i>Search
+                            </button>
+                            <a href="{% url 'add_contact' %}" class="btn btn-outline-success ms-2">
+                                <i class="fas fa-user-plus me-2"></i>Add Contact
+                            </a>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Contacts List -->
+                {% if contacts %}
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-header bg-gradient-primary text-white py-4 rounded-top-4">
+                            <h2 class="mb-0 fw-bold">
+                                <i class="fas fa-address-book me-2"></i>
+                                Your Contacts
+                            </h2>
+                            <p class="mb-0 mt-2 opacity-75">Manage your contacts below</p>
+                        </div>
+                        <div class="card-body p-5">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Phone</th>
+                                            <th scope="col">Category</th>
+                                            <th scope="col">Address</th>
+                                            <th scope="col">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for contact in contacts %}
+                                            <tr>
+                                                <td>{{ contact.name }}</td>
+                                                <td>{{ contact.email }}</td>
+                                                <td>{{ contact.phone }}</td>
+                                                <td>{{ contact.Catagory }}</td>
+                                                <td>{{ contact.address|default:"N/A" }}</td>
+                                                <td>
+                                                    <a href="/update_contact/{{contact.id}}" class="btn btn-sm btn-outline-primary me-2" title="Edit">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <form method="post" action="" class="d-inline" onsubmit="return confirm('Are you sure you want to delete {{ contact.name }}?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-body p-5 text-center">
+                            <i class="fas fa-address-book fa-4x text-muted mb-3"></i>
+                            <h3 class="card-title mb-3 text-dark fw-bold">No Contacts Found</h3>
+                            <p class="card-text text-muted mb-4">
+                                {% if request.GET.q %}
+                                    No contacts match your search query.
+                                {% else %}
+                                    You haven't added any contacts yet.
+                                {% endif %}
+                            </p>
+                            <a href="{% url 'add_contact' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Add Your First Contact
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    {% else %}
+       <!-- Not Authenticated -->
+       <div class="d-flex justify-content-center align-items-center" style="min-height: 400px;">
+        <div class="card shadow-lg border-0" style="max-width: 450px; width: 100%;">
+            <div class="card-body p-5 text-center">
+                <div class="mb-4">
+                    <i class="fas fa-lock fa-4x text-muted"></i>
+                </div>
+                <h3 class="card-title mb-3 text-dark fw-bold">Authentication Required</h3>
+                <p class="card-text text-muted mb-4">
+                    Please log in to access your contact management dashboard and view your contacts.
+                </p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Login to Continue
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-secondary">
+                        Don't have an account? Sign up
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>   
+    {% endif %}
+</div>
+
+<!-- Custom Styles -->
+<style>
+    /* General Layout */
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Card Styling */
+    .card {
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #ffffff;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header.bg-gradient-primary {
+        background: linear-gradient(45deg, #0d6efd, #3b82f6);
+        border-radius: 12px 12px 0 0;
+        padding: 2rem;
+    }
+
+    /* Form and Search Bar Styling */
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: #f8fafc;
+    }
+
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background: #ffffff;
+    }
+
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+        border: 1px solid #d1d5db;
+        background: #f8fafc;
+    }
+
+    /* Table Styling */
+    .table {
+        font-size: 0.95rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: #1f2a44;
+        border-bottom: 2px solid #e5e7eb;
+    }
+
+    .table td {
+        vertical-align: middle;
+        padding: 1rem;
+        color: #374151;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #2563eb, #1e40af);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-outline-primary,
+    .btn-outline-success,
+    .btn-outline-danger {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-success:hover,
+    .btn-outline-danger:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Authentication Section */
+    .auth-icon-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .pulse-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        border: 3px solid #3b82f6;
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.6;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.3);
+            opacity: 0.2;
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.6;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .table-responsive {
+            font-size: 0.9rem;
+        }
+
+        .table td, .table th {
+            padding: 0.75rem;
+        }
+    }
+
+    /* Accessibility */
+    .form-control::placeholder {
+        color: #6b7280;
+        opacity: 1;
+    }
+
+    a:focus,
+    button:focus {
+        outline: 3px solid #3b82f6;
+        outline-offset: 2px;
+    }
+</style>
 {% endblock body %}
