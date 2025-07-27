@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Contacts Export</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; }
+        .contact { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h2>{{ context.user.username }}'s Contacts</h2>
+
+    {% if context.contact %}
+        {% for c in context.contact %}
+            <div class="contact">
+                <strong>Name:</strong> {{ c.name }}<br />
+                <strong>Email:</strong> {{ c.email }}<br />
+                <strong>Phone:</strong> {{ c.phone }}<br />
+                <strong>Address:</strong> {{ c.address }}<br />
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No contacts found.</p>
+    {% endif %}
+</body>
+</html>

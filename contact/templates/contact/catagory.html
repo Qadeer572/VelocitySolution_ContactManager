@@ -1,0 +1,401 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Your Categories{% endblock title %}
+
+{% block body %}
+<div class="container-fluid py-5 bg-light">
+    {% if request.user.is_authenticated %}
+        <!-- Authenticated User Section -->
+        <div class="row justify-content-center">
+            <!-- Category-wise Contacts -->
+            <div class="col-lg-8 col-md-12 mb-4">
+                {% if contact %}
+                    {% regroup contact by Catagory as category_groups %}
+                    {% for group in category_groups %}
+                        <div class="card shadow-lg border-0 rounded-4 mb-4">
+                            <div class="card-header bg-gradient-primary text-white py-4 rounded-top-4">
+                                <h5 class="mb-0 fw-bold">
+                                    <i class="fas fa-folder me-2"></i>
+                                    {{ group.grouper.name|default:"Uncategorized" }}
+                                </h5>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {% for c in group.list %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center py-3">
+                                        <div class="d-flex flex-column">
+                                            <strong class="text-dark">{{ c.name }}</strong>
+                                            <span class="text-muted">{{ c.email }} | {{ c.phone }}</span>
+                                            {% if c.address %}
+                                                <small class="text-muted">{{ c.address }}</small>
+                                            {% endif %}
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="{% url 'update_contact' c.id %}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                <i class="fas fa-edit">✏️</i>
+                                            </a>
+                                            <form method="post" action="{% url 'delete_contact' c.id %}" class="d-inline" onsubmit="return confirm('Are you sure you want to delete {{ c.name }}?');">
+                                                {% csrf_token %}
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                    <i class="fas fa-trash-alt">❌</i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="card shadow-lg border-0 rounded-4">
+                        <div class="card-body p-5 text-center">
+                            <i class="fas fa-address-book fa-4x text-muted mb-3"></i>
+                            <h3 class="card-title mb-3 text-dark fw-bold">No Contacts Found</h3>
+                            <p class="card-text text-muted mb-4">You haven't added any contacts yet.</p>
+                            <a href="{% url 'add_contact' %}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-2"></i>Add Your First Contact
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Add Category Form -->
+            <div class="col-lg-4 col-md-12">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-gradient-success text-white py-4 rounded-top-4">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-plus me-2"></i>
+                            Add New Category
+                        </h5>
+                        <p class="mb-0 mt-2 opacity-75">Create a new category for your contacts</p>
+                    </div>
+                    <div class="card-body p-5">
+                        <form method="post" action="" novalidate>
+                            {% csrf_token %}
+                            
+                            <!-- Non-field errors -->
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Error!</strong>
+                                    {% for error in form.non_field_errors %}
+                                        <div>{{ error }}</div>
+                                    {% endfor %}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endif %}
+
+                            <!-- Form Fields -->
+                            {% for field in form %}
+                                <div class="mb-4">
+                                    <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                        <i class="fas fa-tags me-2 text-success"></i>
+                                        {{ field.label }}
+                                    </label>
+                                    <div class="input-group">
+                                        {{ field }}
+                                    </div>
+                                    {% if field.help_text %}
+                                        <div class="form-text text-muted">{{ field.help_text }}</div>
+                                    {% endif %}
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            <i class="fas fa-exclamation-circle me-1"></i>
+                                            {{ field.errors.0 }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+
+                            <!-- Submit Button -->
+                            <div class="d-grid gap-3">
+                                <button type="submit" class="btn btn-success btn-lg py-3 fw-semibold">
+                                    <i class="fas fa-plus-circle me-2"></i>
+                                    Add Category
+                                </button>
+                                <a href="{% url 'contact' %}" class="btn btn-outline-secondary btn-lg py-3">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Back to Contacts
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    {% else %}
+        <!-- Not Authenticated Section -->
+        <div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+            <div class="col-lg-5 col-md-7 col-sm-9">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-body p-5 text-center">
+                        <!-- Lock Icon with Animation -->
+                        <div class="mb-4">
+                            <div class="auth-icon-wrapper">
+                                <i class="fas fa-lock fa-4x text-primary mb-3"></i>
+                                <div class="pulse-ring"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Header -->
+                        <h2 class="card-title mb-3 text-dark fw-bold">Access Restricted</h2>
+                        <p class="card-text text-muted mb-4 lead">
+                            Please sign in to view and manage your contact categories.
+                        </p>
+                        
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-3">
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-lg py-3 fw-semibold">
+                                <i class="fas fa-sign-in-alt me-2"></i>
+                                Sign In
+                            </a>
+                            <div class="text-center">
+                                <span class="text-muted">New here?</span>
+                                <a href="{% url 'register' %}" class="btn btn-outline-success btn-lg ms-2">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Create Account
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Custom Styles -->
+<style>
+    /* General Layout */
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Card Styling */
+    .card {
+        border-radius: 12px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: #ffffff;
+    }
+
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header.bg-gradient-primary {
+        background: linear-gradient(45deg, #0d6efd, #3b82f6);
+        border-radius: 12px 12px 0 0;
+        padding: 1.5rem;
+    }
+
+    .card-header.bg-gradient-success {
+        background: linear-gradient(45deg, #22c55e, #16a34a);
+        border-radius: 12px 12px 0 0;
+        padding: 1.5rem;
+    }
+
+    /* List Group Styling */
+    .list-group-item {
+        border: none;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem 1.5rem;
+    }
+
+    .list-group-item:last-child {
+        border-bottom: none;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8fafc;
+    }
+
+    /* Form Styling */
+    .form-label {
+        color: #1f2a44;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 1px solid #d1d5db;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+        background: #f8fafc;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        background: #ffffff;
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .invalid-feedback {
+        font-size: 0.875rem;
+        color: #dc3545;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-text {
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(45deg, #2563eb, #1e40af);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-success {
+        background: linear-gradient(45deg, #22c55e, #16a34a);
+        border: none;
+        border-radius: 10px;
+        padding: 0.85rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(45deg, #16a34a, #15803d);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-outline-primary,
+    .btn-outline-danger,
+    .btn-outline-secondary,
+    .btn-outline-success {
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-outline-primary:hover,
+    .btn-outline-danger:hover,
+    .btn-outline-secondary:hover,
+    .btn-outline-success:hover {
+        transform: translateY(-2px);
+    }
+
+    /* Alert Styling */
+    .alert {
+        border-radius: 10px;
+        padding: 1rem 1.5rem;
+        background: #fee2e2;
+        border: 1px solid #f87171;
+    }
+
+    .alert .btn-close {
+        padding: 1rem;
+    }
+
+    /* Authentication Section */
+    .auth-icon-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .pulse-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        border: 3px solid #3b82f6;
+        border-radius: 50%;
+        opacity: 0.6;
+        animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.6;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.3);
+            opacity: 0.2;
+        }
+        100% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.6;
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+        }
+
+        .btn-lg {
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control,
+        .form-select {
+            font-size: 0.95rem;
+        }
+
+        .list-group-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .list-group-item .d-flex {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    /* Accessibility */
+    .form-control::placeholder {
+        color: #6b7280;
+        opacity: 1;
+    }
+
+    a:focus,
+    button:focus {
+        outline: 3px solid #3b82f6;
+        outline-offset: 2px;
+    }
+</style>
+{% endblock body %}
